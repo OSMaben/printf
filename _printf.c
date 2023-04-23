@@ -5,37 +5,51 @@ int _printf(const char *format, ...)
 	va_list args;
 	va_start(args, format);
 
+	int count = 0;
+
 	while (*format != '\0')
 	{
 		if (*format != '%')
 		{
-			putchar(*format);
+			_putchar(*format);
+			count++;
 			format++;
 		}
 		else 
 		{
-			format = format + 1;
+			format++;
 			switch (*format)
 			{
 				case 'c':
-					char c =va_arg(args,int);
-					putchar(c);
-					format++;
+					char c = va_arg(args, int);
+					_putchar(c);
+					count++;
 					break;
 				case 's':
 					char *s = va_arg(args, char *);
-					putchar(s);
-					format += strlen(s);
+					while (*s != '\0') {
+						_putchar(*s);
+						count++;
+						s++;
+					}
 					break;
 				case '%':
-					putchar('%');
-					format++;
+					_putchar('%');
+					count++;
+					break;
+				default:
+					_putchar('%');
+					count++;
+					_putchar(*format);
+					count++;
+					break;
 			}
+			format++;
 		}
-		format++;
 	}
 
 	va_end(args);
-	retunr format
-
+	return count;
 }
+
+
