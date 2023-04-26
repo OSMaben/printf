@@ -1,61 +1,49 @@
 #include "main.h"
-int  my_printf(const char *format, ...)
+/**
+ * _printf - function similar toputf of
+ * standard library functions
+ * @format:the formated string after modification
+ *
+ * Return: number of bytesputed
+ */
+int _printf(const char *format, ...)
 {
-	unsigned h = 0, r_value = 0;
+	int sum = 0;
 	va_list args;
+	char *p, *start;
+	params_t params = PARAMETERS;
+
 	va_start(args, format);
 
-	for ( ; format[h] != '\0' ; h++)
+	if (!format || (format[0] == '%' && !format[1]))
+		return (-1);
+	if (format[0] == '%' && format[1] == ' ' && !format[2])
+		return (-1);
+	for (p = (char *)format; *p; p++)
 	{
-		if (format[h] != '%')
+		init_params(&params, args);
+		if (*p != '%')
 		{
-			_putchar(format[h]);
+			sum += _putchar(*p);
+			continue;
 		}
-		else if (format[h+1] == 'c')
+		start = p;
+		p++;
+		while (hold_flag(p, &params))
 		{
-			_putchar(va_arg(args, int));
-			h++;
+			p++;
 		}
-		else if (format[h+1] == 's')
-		{
-			int r_val = put_s(va_arg(args, char *));
-			h++;
-			r_value += (r_val - 1);
-		}
-		else if (format[h+1] == '%')
-		{
-			_putchar('%');
-			h++;
-		}
-		r_value += 1;
+		p = hold_width(p, &params, args);
+		p = hold_precision(p, &params, args);
+		if (hold_modifier(p, &params))
+			p++;
+		if (!hold_specifier(p))
+			sum += put_from_to(start, p,
+				params.long_modif || params.short_modif ? p - 1 : 0);
+		else
+			sum += hold_put_func(p, args, &params);
 	}
-	return (r_value);
+	_putchar(BUFFER_SH);
+	va_end(args);
+	return (sum);
 }
-
-
-
-
-int put_s(char *string)
-{
-	int idx = 0, r_val = 0;
-
-	if (string)
-	{
-		while (string[idx] != '\0')
-		{
-			_putchar(string[idx]);
-			r_val += 1;
-			idx++;
-		}
-	}
-	return (r_val);
-}
-
-
-
-int _putchar(char c)
-{
-	    return (write(1, &c, 1));
-}
-
-
